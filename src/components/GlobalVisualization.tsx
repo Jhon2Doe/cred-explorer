@@ -9,11 +9,11 @@ interface DomainLocation {
   lon: number;
 }
 
-interface WorldMapProps {
+interface GlobalVisualizationProps {
   locations: DomainLocation[];
 }
 
-// Country code mapping for better matching
+// Country code listing for better tracking
 const countryCodeMap: Record<string, string> = {
   'United States': 'US',
   'USA': 'US',
@@ -171,7 +171,7 @@ const countryCodeMap: Record<string, string> = {
   'Bahamas': 'BS'
 };
 
-export const WorldMap: React.FC<WorldMapProps> = ({ locations }) => {
+export const GlobalVisualization: React.FC<GlobalVisualizationProps> = ({ locations }) => {
   const [glowingCountries, setGlowingCountries] = useState<Set<string>>(new Set());
 
   useEffect(() => {

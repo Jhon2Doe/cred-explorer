@@ -4,11 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CredentialCard } from './CredentialCard';
 import { StatsHeader } from './StatsHeader';
-import { DomainMap } from './DomainMap';
+import { GlobalVisualization } from './GlobalVisualization';
 import { toast } from '@/hooks/use-toast';
 
 interface Credential {
@@ -44,7 +43,6 @@ const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState<'domain' | 'username'>('domain');
   const [domainLocations, setDomainLocations] = useState<DomainLocation[]>([]);
-  const [activeTab, setActiveTab] = useState('search');
 
   const baseUrl = 'http://192.168.102.55:8080';
 
@@ -140,112 +138,125 @@ const Dashboard: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <StatsHeader />
         
-        <div className="mb-8">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-card border border-border">
-              <TabsTrigger value="search" className="flex items-center gap-2">
-                <Search className="w-4 h-4" />
-                Search
-              </TabsTrigger>
-              <TabsTrigger value="approved" className="flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                Approved
-              </TabsTrigger>
-              <TabsTrigger value="rejected" className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Rejected
-              </TabsTrigger>
-              <TabsTrigger value="map" className="flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                World Map
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="search" className="space-y-6">
-              <Card className="bg-gradient-card border-border shadow-card">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-foreground">
-                    <Database className="w-5 h-5" />
-                    Search Credentials
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-4 items-end">
-                    <div className="flex-1">
-                      <label htmlFor="search" className="block text-sm font-medium text-foreground mb-2">
-                        Search Query
-                      </label>
-                      <Input
-                        id="search"
-                        placeholder="Enter domain or username..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        className="bg-input border-border text-foreground"
-                      />
-                    </div>
-                    <div className="w-48">
-                      <label htmlFor="type" className="block text-sm font-medium text-foreground mb-2">
-                        Search Type
-                      </label>
-                      <Select value={searchType} onValueChange={(value: 'domain' | 'username') => setSearchType(value)}>
-                        <SelectTrigger className="bg-input border-border text-foreground">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="domain">Domain</SelectItem>
-                          <SelectItem value="username">Username</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <Button 
-                      onClick={handleSearch} 
-                      disabled={loading || !searchQuery.trim()}
-                      className="bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-glow transition-all duration-300"
-                    >
-                      {loading ? 'Searching...' : 'Search'}
-                    </Button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Search Panel */}
+          <div className="lg:col-span-2">
+            <Card className="bg-gradient-card border-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Database className="w-5 h-5" />
+                  Search Credentials
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4 items-end mb-4">
+                  <div className="flex-1">
+                    <label htmlFor="search" className="block text-sm font-medium text-foreground mb-2">
+                      Search Query
+                    </label>
+                    <Input
+                      id="search"
+                      placeholder="Enter domain or username..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      className="bg-input border-border text-foreground"
+                    />
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="approved">
-              <div className="mb-4">
-                <Button 
-                  onClick={() => handleStatusFilter('1')}
-                  disabled={loading}
-                  className="bg-success hover:bg-success/90 text-white"
-                >
-                  {loading ? 'Loading...' : 'Load Approved Credentials'}
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="rejected">
-              <div className="mb-4">
-                <Button 
-                  onClick={() => handleStatusFilter('2')}
-                  disabled={loading}
-                  className="bg-danger hover:bg-danger/90 text-white"
-                >
-                  {loading ? 'Loading...' : 'Load Rejected Credentials'}
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="map">
-              <Card className="bg-gradient-card border-border shadow-card">
-                <CardHeader>
-                  <CardTitle className="text-foreground">Domain Locations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <DomainMap locations={domainLocations} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                  <div className="w-48">
+                    <label htmlFor="type" className="block text-sm font-medium text-foreground mb-2">
+                      Search Type
+                    </label>
+                    <Select value={searchType} onValueChange={(value: 'domain' | 'username') => setSearchType(value)}>
+                      <SelectTrigger className="bg-input border-border text-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="domain">Domain</SelectItem>
+                        <SelectItem value="username">Username</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button 
+                    onClick={handleSearch} 
+                    disabled={loading || !searchQuery.trim()}
+                    className="bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-glow transition-all duration-300"
+                  >
+                    {loading ? 'Searching...' : 'Search'}
+                  </Button>
+                </div>
+                
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={() => handleStatusFilter('1')}
+                    disabled={loading}
+                    variant="secondary"
+                    className="bg-success hover:bg-success/90 text-white"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    {loading ? 'Loading...' : 'Load Approved'}
+                  </Button>
+                  <Button 
+                    onClick={() => handleStatusFilter('2')}
+                    disabled={loading}
+                    variant="secondary"
+                    className="bg-danger hover:bg-danger/90 text-white"
+                  >
+                    <AlertTriangle className="w-4 h-4 mr-2" />
+                    {loading ? 'Loading...' : 'Load Rejected'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Quick Stats */}
+          <div>
+            <Card className="bg-gradient-card border-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Globe className="w-5 h-5" />
+                  Quick Stats
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-2xl font-bold text-primary">{credentials.length}</p>
+                  <p className="text-sm text-muted-foreground">Total Results</p>
+                </div>
+                <div className="text-center p-4 bg-muted rounded-lg">
+                  <p className="text-2xl font-bold text-primary">{domainLocations.length}</p>
+                  <p className="text-sm text-muted-foreground">Unique Locations</p>
+                </div>
+                {domainLocations.length > 0 && (
+                  <div className="text-center p-4 bg-muted rounded-lg">
+                    <p className="text-2xl font-bold text-primary">
+                      {[...new Set(domainLocations.map(loc => loc.country))].length}
+                    </p>
+                    <p className="text-sm text-muted-foreground">Countries</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
+
+        {/* Global Threat Visualization */}
+        {domainLocations.length > 0 && (
+          <div className="mb-8">
+            <Card className="bg-gradient-card border-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-foreground">
+                  <Globe className="w-5 h-5" />
+                  Global Threat Distribution
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <GlobalVisualization locations={domainLocations} />
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {credentials.length > 0 && (
           <div>
